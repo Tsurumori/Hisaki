@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>01.01 - WebGLRenderer - Skeleton</title>
+    <script src="js/three.min.js"></script>
+    <style>
+
+        #canvas3d{
+            width:800px;
+            height:450px;
+            margin:100px auto;
+        }
+    </style>
+</head>
+<body>
+<div id="canvas3d"></div>
+<script>
+
+    // global variables
+    var renderer;
+    var scene;
+    var camera;
+    var light;
+    var cube;
+
+    function init() {
+        scene = new THREE.Scene();
+
+
+        // 摄像机的视角、宽高比、近和远两个视截面。
+        camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000); //正交摄像机:OrthographicCamera   PerspectiveCamera:透视摄像机
+
+        renderer = new THREE.WebGLRenderer({antialias:true});
+        renderer.setClearColor(0x333333, 1.0);
+
+        renderer.setSize('800', '450');
+
+        var cubeGeometry = new THREE.BoxGeometry(35,20,15);
+        var cubeMaterial = new THREE.MeshNormalMaterial({wireframe : true});  //材质
+
+        cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        var border = new THREE.EdgesHelper( cube,0xffff00 );  //添加边框
+        scene.add(cube);
+        scene.add(border);
+
+        // position and point the camera to the center of the scene
+        camera.position.x = 30;
+        camera.position.y = 25;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+
+        // Light
+        light = new THREE.DirectionalLight(0xff0000, 1.0, 0);
+        light.position.set( 200, 200, 200 );//设置光源向量
+        scene.add(light);
+
+        // add the output of the renderer to the html element
+        document.getElementById('canvas3d').appendChild(renderer.domElement);
+
+        // call the render function
+        render();
+    }
+
+    function render() {
+        renderer.render(scene, camera);
+    }
+
+    // calls the init function when the window is done loading.
+    window.onload = init;
+
+</script>
+
+</body>
+</html>

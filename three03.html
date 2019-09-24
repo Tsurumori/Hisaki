@@ -11,20 +11,19 @@
 <body>
 <div id="canvas3d"></div>
 <script>
-    var renderer;
-    var scene;
-    var camera;
-    var light;
-    var cube;
-    var stats;
-    var control;
-    var camControl;
+    let renderer;
+    let scene;
+    let camera;
+    let light;
+    let cube;
+    let stats;
+    let control;
+    let camControl;
+
     function init() {
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-        // 控制器
-        camControl = new THREE.TrackballControls(camera);
-        camControl.rotateSpeed = 10;
+
         camera.position.x = 35;
         camera.position.y = 20;
         camera.position.z = 15;
@@ -44,7 +43,7 @@
         sphere.castShadow = true;
         scene.add(sphere);
 
-        var texture = THREE.ImageUtils.loadTexture('source/02.jpg');
+        const texture = THREE.ImageUtils.loadTexture('source/02.jpg');
         sphereMaterial.map = texture;
         // 转轴
         pivotPoint = new THREE.Object3D();
@@ -74,20 +73,20 @@
             //vertex.multiplyScalar(67);
             starsGeometry.vertices.push(vertex);
         }
-        var starsMaterial = new THREE.ParticleBasicMaterial({
+        const starsMaterial = new THREE.ParticleBasicMaterial({
             color: Math.random() * 0xffffff, // 随机颜色
             size: 3,
             sizeAttenuation: false
         });
-        var stars = new THREE.ParticleSystem(starsGeometry, starsMaterial);
+        const stars = new THREE.ParticleSystem(starsGeometry, starsMaterial);
         stars.scale.set(300, 300, 300);
         stars.name = 'stars';
         scene.add(stars);
 
         // 圆环
-        var torusGeometry = new THREE.TorusGeometry(14.3,0.03,50,50);
-        var torusMaterial = new THREE.MeshBasicMaterial({color:0xaaaaaa});
-        var tours = new THREE.Mesh(torusGeometry,torusMaterial);
+        const torusGeometry = new THREE.TorusGeometry(14.3, 0.03, 50, 50);
+        const torusMaterial = new THREE.MeshBasicMaterial({color: 0xaaaaaa});
+        const tours = new THREE.Mesh(torusGeometry, torusMaterial);
         tours.position.x = 0;
         tours.position.y = 0;
         tours.position.z = 0;
@@ -109,6 +108,10 @@
         stats = createStats();
         document.getElementById('canvas3d').appendChild(stats.domElement);
 
+        // 控制器
+        camControl = new THREE.TrackballControls(camera, renderer.domElement);
+        camControl.rotateSpeed = 10;
+
         control = new function (){
             this.rotationSpeedY = 0.01;
             this.sphereRotationSpeedY = 0.003;
@@ -119,7 +122,7 @@
         render();
     }
     function createStats() {
-        var stats = new Stats();
+        const stats = new Stats();
         stats.setMode(0); // 默认的监听fps
         stats.domElement.style.position = 'absolute';
         stats.domElement.style.left = '0px';
@@ -127,7 +130,7 @@
         return stats;
     }
     function addControls(controlObject){
-        var gui = new dat.GUI();
+        const gui = new dat.GUI();
         gui.add(controlObject,'rotationSpeedY',-0.1,0.1);
         gui.add(controlObject,'sphereRotationSpeedY',-0.005,0.005);
         gui.add(controlObject,'rotationSpeedY',-0.05,0.05);
@@ -143,8 +146,8 @@
         stats.update();
     }
     window.onload = init; // 运行
-    // ERROR: preventDefault inside passive event listener due to target being treated as passive.
-    // ERROR; 菜单松鼠标无法停止
+    // ERROR: preventDefault inside passive event listener due to target being treated as passive.   浏览器问题
+    // ERROR; 菜单松鼠标无法停止   解决：控制器定义的位置没有放对
 </script>
 </body>
 </html>

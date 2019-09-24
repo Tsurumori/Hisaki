@@ -24,6 +24,7 @@
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
         // 控制器
         camControl = new THREE.TrackballControls(camera);
+        camControl.rotateSpeed = 10;
         camera.position.x = 35;
         camera.position.y = 20;
         camera.position.z = 15;
@@ -34,7 +35,7 @@
 
         // 中心球
         var sphereGeometry = new THREE.SphereGeometry(7,25,25);
-        var sphereMaterial = new THREE.MeshBasicMaterial({"color": 0xC0C0C0});
+        var sphereMaterial = new THREE.MeshBasicMaterial();
         var sphere = new THREE.Mesh(sphereGeometry,sphereMaterial);
         sphere.position.x = 0;
         sphere.position.y = 1;
@@ -43,6 +44,8 @@
         sphere.castShadow = true;
         scene.add(sphere);
 
+        var texture = THREE.ImageUtils.loadTexture('source/02.jpg');
+        sphereMaterial.map = texture;
         // 转轴
         pivotPoint = new THREE.Object3D();
         pivotPoint.rotation.x = 0.4;
@@ -64,6 +67,7 @@
         for (var i = 0; i < 2000; i++) {
             // create a new vertex with random coordinates between -1 and 1
             var vertex = new THREE.Vector3();
+            // 随机位置
             vertex.x = Math.random() * 2 - 1;
             vertex.y = Math.random() * 2 - 1;
             vertex.z = Math.random() * 2 - 1;
@@ -71,8 +75,8 @@
             starsGeometry.vertices.push(vertex);
         }
         var starsMaterial = new THREE.ParticleBasicMaterial({
-            color: Math.random() * 0xffffff,
-            size: 2,
+            color: Math.random() * 0xffffff, // 随机颜色
+            size: 3,
             sizeAttenuation: false
         });
         var stars = new THREE.ParticleSystem(starsGeometry, starsMaterial);
@@ -125,6 +129,8 @@
     function addControls(controlObject){
         var gui = new dat.GUI();
         gui.add(controlObject,'rotationSpeedY',-0.1,0.1);
+        gui.add(controlObject,'sphereRotationSpeedY',-0.005,0.005);
+        gui.add(controlObject,'rotationSpeedY',-0.05,0.05);
     }
     function render() {
         renderer.render(scene, camera);
@@ -132,11 +138,13 @@
         scene.getObjectByName('sphere').rotation.y += control.sphereRotationSpeedY;
         scene.getObjectByName('spheresml').rotation.y += control.sphereRotationSpeedY;
         scene.getObjectByName('stars').rotation.y += control.starRoitationSpeedZ;
-        camControl.update();
         requestAnimationFrame(render);
+        camControl.update();
         stats.update();
     }
     window.onload = init; // 运行
+    // ERROR: preventDefault inside passive event listener due to target being treated as passive.
+    // ERROR; 菜单松鼠标无法停止
 </script>
 </body>
 </html>

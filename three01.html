@@ -28,7 +28,8 @@
 
 
         // 摄像机的视角、宽高比、近和远两个视截面。
-        camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000); //正交摄像机:OrthographicCamera   PerspectiveCamera:透视摄像机
+        // 正交摄像机:OrthographicCamera   PerspectiveCamera:透视摄像机
+        camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000);
 
         renderer = new THREE.WebGLRenderer({antialias:true});
         renderer.setClearColor(0x333333, 1.0);

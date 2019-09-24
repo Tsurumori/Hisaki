@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>three03</title>
+    <script src="js/three.min.js"></script>
+    <script src="js/stats.min.js"></script>
+    <script src="js/dat.gui.min.js"></script>
+    <script src="js/TrackballControls.js"></script>
+</head>
+<body>
+<div id="canvas3d"></div>
+<script>
+    var renderer;
+    var scene;
+    var camera;
+    var light;
+    var cube;
+    var stats;
+    var control;
+    var camControl;
+    function init() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+        // 控制器
+        camControl = new THREE.TrackballControls(camera);
+        camera.position.x = 35;
+        camera.position.y = 20;
+        camera.position.z = 15;
+
+        renderer = new THREE.WebGLRenderer({"antialias":true});
+        renderer.setClearColor(0x000000,1.0);
+        renderer.setSize('1000','550');
+
+        // 中心球
+        var sphereGeometry = new THREE.SphereGeometry(7,25,25);
+        var sphereMaterial = new THREE.MeshBasicMaterial({"color": 0xC0C0C0});
+        var sphere = new THREE.Mesh(sphereGeometry,sphereMaterial);
+        sphere.position.x = 0;
+        sphere.position.y = 1;
+        sphere.position.z = 0;
+        sphere.name = 'sphere';
+        sphere.castShadow = true;
+        scene.add(sphere);
+
+        // 转轴
+        pivotPoint = new THREE.Object3D();
+        pivotPoint.rotation.x = 0.4;
+        sphere.add(pivotPoint);
+
+        // 旋转球
+        var sphereGeometrysml = new THREE.SphereGeometry(2, 25, 25);
+        var sphereMaterialsml = new THREE.MeshBasicMaterial({'color': 0xFFFFFF});
+        var spheresml = new THREE.Mesh(sphereGeometrysml, sphereMaterialsml);
+        spheresml.position.x = 10;
+        spheresml.position.y = -2;
+        spheresml.position.z = -10;
+        spheresml.name = 'spheresml';
+        spheresml.castShadow = true;
+        pivotPoint.add(spheresml);
+
+        // 星星
+        var starsGeometry = new THREE.Geometry(); // an empty geometry
+        for (var i = 0; i < 2000; i++) {
+            // create a new vertex with random coordinates between -1 and 1
+            var vertex = new THREE.Vector3();
+            vertex.x = Math.random() * 2 - 1;
+            vertex.y = Math.random() * 2 - 1;
+            vertex.z = Math.random() * 2 - 1;
+            //vertex.multiplyScalar(67);
+            starsGeometry.vertices.push(vertex);
+        }
+        var starsMaterial = new THREE.ParticleBasicMaterial({
+            color: Math.random() * 0xffffff,
+            size: 2,
+            sizeAttenuation: false
+        });
+        var stars = new THREE.ParticleSystem(starsGeometry, starsMaterial);
+        stars.scale.set(300, 300, 300);
+        stars.name = 'stars';
+        scene.add(stars);
+
+        // 圆环
+        var torusGeometry = new THREE.TorusGeometry(14.3,0.03,50,50);
+        var torusMaterial = new THREE.MeshBasicMaterial({color:0xaaaaaa});
+        var tours = new THREE.Mesh(torusGeometry,torusMaterial);
+        tours.position.x = 0;
+        tours.position.y = 0;
+        tours.position.z = 0;
+        tours.rotation.x = -20.6;
+        tours.rotation.y = 0;
+        tours.rotation.z = 0;
+        tours.castShadow = true;
+        tours.name = 'tours';
+        pivotPoint.add(tours);
+
+        light = new THREE.DirectionalLight(0xffffff, 1.0, 0);
+        light.position.set( 200, 200, 200 );
+        light.shadowMapEnabled = true;
+        light.shadowCameraNear = 20;
+        light.shadowCameraFar = 100;
+        scene.add(light);
+
+        document.getElementById('canvas3d').appendChild(renderer.domElement);
+        stats = createStats();
+        document.getElementById('canvas3d').appendChild(stats.domElement);
+
+        control = new function (){
+            this.rotationSpeedY = 0.01;
+            this.sphereRotationSpeedY = 0.003;
+            this.starRoitationSpeedZ = 0.001;
+        }
+        addControls(control);
+
+        render();
+    }
+    function createStats() {
+        var stats = new Stats();
+        stats.setMode(0); // 默认的监听fps
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.left = '0px';
+        stats.domElement.style.top = '5px';
+        return stats;
+    }
+    function addControls(controlObject){
+        var gui = new dat.GUI();
+        gui.add(controlObject,'rotationSpeedY',-0.1,0.1);
+    }
+    function render() {
+        renderer.render(scene, camera);
+        pivotPoint.rotation.y += control.rotationSpeedY;
+        scene.getObjectByName('sphere').rotation.y += control.sphereRotationSpeedY;
+        scene.getObjectByName('spheresml').rotation.y += control.sphereRotationSpeedY;
+        scene.getObjectByName('stars').rotation.y += control.starRoitationSpeedZ;
+        camControl.update();
+        requestAnimationFrame(render);
+        stats.update();
+    }
+    window.onload = init; // 运行
+</script>
+</body>
+</html>

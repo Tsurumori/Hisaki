@@ -29,6 +29,7 @@
         var control;
 
         function init() {
+            // 定义一个scene
             scene = new THREE.Scene();
 
             camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1000);
@@ -38,21 +39,22 @@
             camera.position.z = 15;
             camera.lookAt(scene.position);
 
+            // 绘制场景
             // create a render, sets the background color and the size
-            renderer = new THREE.WebGLRenderer({antialias:true});
+            renderer = new THREE.WebGLRenderer({'antialias':true});
             renderer.setClearColor(0x343434, 1.0);
             renderer.setSize('800', '450');
             //renderer.setSize('1000', '550');
 
-            // create a cube and add to scene
+
+            // 长方体
             var cubeGeometry = new THREE.BoxGeometry(15,15,15,1,1,1);
             var cubeMaterial = new THREE.MeshNormalMaterial({wireframe : true});  //材质
-
             cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
             var border = new THREE.EdgesHelper( cube,0xffff00 );  //添加边框
             cube.name = 'cube';
             scene.add(cube);
-            scene.add(border);
+
 
             //圆柱体
             var cylinderGeometry = new THREE.CylinderGeometry(8, 8,10,30,30);
@@ -69,14 +71,10 @@
             var sphereGeometry = new THREE.SphereGeometry(7, 25, 25);
             var sphereMaterial = new THREE.MeshLambertMaterial({color: 0x7777ff});
             var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-
-            // position the sphere
             sphere.position.x = 0;
             sphere.position.y = 0;
             sphere.position.z = 0;
             sphere.castShadow = true;
-
-            // add the sphere to the scene
             scene.add(sphere);
 
             //圆环
@@ -90,8 +88,9 @@
             tours.name = 'tours';
             scene.add(tours);
 
-            var texture = new THREE.ImageUtils.loadTexture("http://10.1.26.29:84/Brick-2399.jpg");
-            torusMaterial.map = texture;
+            // 加载一张图片作为纹理
+            var texture = new THREE.ImageUtils.loadTexture('source/01.jpg');
+            torusMaterial.map = texture;// map属性接受纹理
 
             //设置light
             light = new THREE.DirectionalLight(0xff0000, 1.0, 0);
@@ -106,7 +105,6 @@
             control = new function (){
                 this.rotationSpeed = 0.005;
                 this.scale = 1;
-
                 this.rotationSpeed2 = 0.05;
             }
             addControls(control);
@@ -114,35 +112,34 @@
             // call the render function
             render();
         }
+
+        // 性能检测
         function createStats() {
             var stats = new Stats();
             stats.setMode(0);
-
             stats.domElement.style.position = 'absolute';
             stats.domElement.style.left = '0px';
             stats.domElement.style.top = '5px';
-
             return stats;
         }
 
+        // 创建菜单栏
         function addControls(controlObject){
             var gui = new dat.GUI();
-            gui.add(controlObject,'rotationSpeed',-0.1,0.1);
+            gui.add(controlObject,'rotationSpeed',-0.2,0.2);
             gui.add(controlObject, 'scale', 0.01, 2);
-
-            gui.add(controlObject, 'rotationSpeed2', -0.1, 0.1);
+            gui.add(controlObject, 'rotationSpeed2', -0.2, 0.2);
         }
 
+        // 加入运动
         function render() {
             renderer.render(scene, camera);
             scene.getObjectByName('cube').rotation.x += control.rotationSpeed;
             scene.getObjectByName('cube').scale.set(control.scale, control.scale, control.scale);
-
             scene.getObjectByName('cylinder').rotation.z += control.rotationSpeed2;
-
             scene.getObjectByName('tours').rotation.z += 0.05;
-            requestAnimationFrame(render);
-            stats.update();
+            requestAnimationFrame(render); // 执行动画，通常为每秒60次 cancelAnimationFrame()以取消
+            stats.update(); // 不断更新
         }
 
         // calls the init function when the window is done loading.

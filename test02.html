@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Link Start!</title>
+    <script src="js/three.min.js"></script>
+    <script src="js/leap-0.6.4.js"></script>
+    <script src="js/leap-plugins-0.1.11pre.js"></script>
+    <script src="js/leap-widgets-0.1.0.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <style>
+        canvas.leap-boneHAnd{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+<script>
+    console.log("leap loaded");
+    //
+    // (window.controller = new Leap.Controller)
+    //     .use('riggedHand')
+    //     .connect()
+
+
+    // Set up plugins
+
+    Leap.loop({background: true})
+        .use('transform', {
+            vr: 'desktop' // Switch to meters.
+        })
+        .use('boneHand', {
+            targetEl: document.body,
+            jointColor: new THREE.Color(0xffffff),
+        })
+        .use('proximity');
+
+
+    // Set up scene
+
+    var scene = Leap.loopController.plugins.boneHand.scene;
+    var camera = Leap.loopController.plugins.boneHand.camera;
+    var renderer = Leap.loopController.plugins.boneHand.renderer;
+    camera.position.set( 0, 0.3, 0.6 );
+
+    // var controls = new THREE.OrbitControls( camera );
+
+    var planeGeo = new THREE.PlaneGeometry(0.1, 0.2);
+    var material = new THREE.MeshPhongMaterial();
+    var buttonMesh = new THREE.Mesh(planeGeo, material);
+    buttonMesh.name = "button";
+
+    var light = new THREE.DirectionalLight('red', 1.5);
+    light.position.set(-1, 2, 4);
+    scene.add(light);
+
+    var longThrow = -0.1;
+    var squareButton = new PushButton(
+
+        new InteractablePlane(buttonMesh, Leap.loopController),
+
+        {
+            locking: false,
+            longThrow: longThrow
+        }
+
+    ).on('press', function(mesh){
+
+        mesh.material.color.setHex(0xccccff);
+        console.log("presss")
+
+    }).on('release', function(mesh){
+        console.log("release");
+        mesh.material.color.setHex(0xeeeeee);
+
+    });
+
+    squareButton.plane.hover(
+        function(mesh){ // over
+            console.log('hover in');
+            mesh.material.color.setHex(0xffccff);
+        },
+        function(mesh){ // out
+            console.log('hover out');
+            mesh.material.color.setHex(0xeeeeee);
+        }
+    );
+
+
+    var base = new THREE.Mesh(new THREE.BoxGeometry(0.1, longThrow, longThrow), new THREE.MeshPhongMaterial({color: 0x222222}));
+    base.position.set(0, 0, -0.1);
+    base.rotateY(Math.PI * -0.23);
+
+    buttonMesh.position.set(
+        0,
+        buttonMesh.geometry.parameters.height / 2 - longThrow / 2,
+        -longThrow / 2
+    );
+    squareButton.plane.resetPosition();
+
+    base.add(buttonMesh);
+
+    scene.add(base);
+
+
+</script>
+</body>
+</html>
